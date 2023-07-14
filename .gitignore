@@ -1,7 +1,2 @@
-*
-!/**/
-!*.*
-
-!Makefile
-
-*.[oad]
+*.exe
+notes/*
