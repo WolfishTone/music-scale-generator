@@ -2,11 +2,11 @@ using System;
 
 public class Tone// нота
 {
-	static string [] note_names = new string []   {"A",   "A#",   "B",    "C",    "C#",   "D",    "D#",   "E",    "F",    "F#",   "G",   "G#"};
-	static float [] note_freqs = new float []    {27.5f, 29.14f, 30.87f, 16.35f, 17.32f, 18.35f, 19.44f, 20.61f, 21.82f, 23.12f, 24.5f, 25.95f}; 
+	static string [] note_names = new string []   {"C",    "C#",   "D",    "D#",   "E",    "F",    "F#",   "G",   "G#",    "A",   "A#",   "B",};
+	static float [] note_freqs = new float []    {16.35f, 17.32f, 18.35f, 19.44f, 20.61f, 21.82f, 23.12f, 24.5f, 25.95f,  27.5f, 29.14f, 30.87f}; 
 	
 	// конструкторы /===================================
-	public Tone() // для тоники
+	public Tone()
 	{
 	}
 	public Tone(string note)
@@ -69,7 +69,7 @@ public class Tone// нота
 		}
 	}
 	private byte duration; // длительность ноты
-	public float Duration
+	public byte Duration
 	{
 		get
 		{
@@ -114,15 +114,16 @@ public class Tone// нота
 		return -1;
 	}
 	
-	public void Next_Note ()
+	public bool Next_Note ()
 	{
 		sbyte note_ind= note_index(note);
 		if(note_ind == note_names.Length-1) // если нота G#
 		{
 			if(this.octave == 8)
 			{
+				Console.WriteLine("\\0==============");
 				this.note= "\\0";
-				return; // самая высокая нота
+				return true; // самая высокая нота
 			}
 			else
 				this.octave += 1;	
@@ -132,6 +133,7 @@ public class Tone// нота
 			note_ind+=1;
 		this.note= note_names[note_ind];
 		this.freq = get_freq(octave, note_names[note_ind]);
+		return false; // успешное завершение
 	}
 	
 	public Tone Copy ()
