@@ -11,14 +11,13 @@ public class Wolfish_WAV
 	private static int WAVE = 0x45564157; // меня не касается
        	private static int format = 0x20746D66; // туда же
        	private static short formatType = 1; // для линейного квантования, т.е. без сжатия
-       	private static int data = 0x61746164;
+       	private static int data = 0x61746164; 
        	private static int formatChunkSize = 16; // размеры
        	private static int headerSize = 8; //    для заголовка
        	private static int waveSize = 4; //    меня не касается
        	private static int samplesPerSecond = 44100; // Частота дискретизации. это максимум
 	private static short chenalNum = 1; // кол-во каналов
 	private static short bitsPerSample = 16; // кол-во бит на один семпл
-	//private static double perfect = 1.5; // для нахождения частоты
 	private static short ampl = 10000; // громкость
 	
 	private static short sampleSize;
@@ -29,7 +28,7 @@ public class Wolfish_WAV
         private static int dataChunkSize;
 	private static int fileSize;
 	
-	private static short bpm = 45;
+	private static short bpm = 24;
 	private static short Bpm // темп
 	{
 		get
@@ -67,10 +66,16 @@ public class Wolfish_WAV
 	
 	private static float get_lengthInSec(Scale scale)
 	{
-		int notes_sum_duration= 0; // ноты могут иметь разные длительности, поэтому их длительности складываются
+	float notes_sum_duration= 0; // ноты могут иметь разные длительности, поэтому их длительности складываются
 		for (int i = 0; i< scale.Size;i++)
-			notes_sum_duration+= scale.Selected_scale[i].Duration;
-		return scale.Size * notes_sum_duration / bpm;
+		{
+			notes_sum_duration+= 1/((float)Math.Pow(scale.Selected_scale[i].Music_size,scale.Selected_scale[i].Duration));
+		//	Console.WriteLine($"{scale.Selected_scale[i].Music_size}  {scale.Selected_scale[i].Duration}");
+		//	Console.WriteLine($"notes_sum_duration= {notes_sum_duration}");
+		}
+		Console.WriteLine($"notes_sum_duration= {notes_sum_duration}");
+		Console.WriteLine($"{notes_sum_duration / bpm* 60}");
+		return notes_sum_duration / bpm * 60;
 	}
 	
 	public static void generate (Scale scale) // инициализация заголовочной части wav файла
@@ -101,16 +106,18 @@ public class Wolfish_WAV
 		double freq;
 		for(int note_ind = 0; note_ind < scale.Size; note_ind++)
 		{
-			freq= Math.PI * 2 * scale.Selected_scale[note_ind].Freq / samplesPerSecond;
+			freq= Math.PI * scale.Selected_scale[note_ind].Freq / samplesPerSecond;
+			
 			for (int i = 0; i < samples / scale.Size; i++)
 			{
-            			short s= (short)(Flat(i, freq) * ampl);
+            			short s= (short)(Saw(i, freq) * ampl);
             			composer.Write(s);
 			}
 		}
 		composer.Close();
          	stream.Close();		
 	}
+	
 	public static double Sine(int index, double frequency) // синусоидный сигнал
 	{
 		return Math.Sin(frequency * index);

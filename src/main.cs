@@ -1,19 +1,13 @@
 using System;
 using System.IO;
 
+
 class HZ
 {
 public static void Main()
 	{
-		Tone note = new Tone("a#", 7);
-		Console.WriteLine($" Note= {note.Note} Octave= {note.Octave} Freq= {note.Freq}");
-		
-		note.Next_Note ();
-		
-		Tone copy = note.Copy();
-		Console.WriteLine($" Note= {copy.Note} Octave= {copy.Octave} Freq= {copy.Freq}");
-		
-		Scale minor = new Scale();
+		Scale.Make_up();
+		Scale minor = new Scale("a", 1, 0);
 		Wolfish_WAV.generate (minor);
 		Console.WriteLine("Конец");
 	}
