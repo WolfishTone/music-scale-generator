@@ -36,6 +36,8 @@ public class Wolfish_WAV
 			return bpm;
 		}
 	}
+	
+	private static float tacts_num; // число тактов
 	//==================================================
 	
 	// методы /=========================================
@@ -64,21 +66,26 @@ public class Wolfish_WAV
 		return waveSize + headerSize + formatChunkSize + headerSize + dataChunkSize;
 	}
 	
-	private static float get_lengthInSec(Scale scale)
+	private static float get_lengthInSec()
 	{
-	float notes_sum_duration= 0; // ноты могут иметь разные длительности, поэтому их длительности складываются
-		for (int i = 0; i< scale.Size;i++)
-		{
-			notes_sum_duration+= 1/((float)Math.Pow(scale.Selected_scale[i].Music_size,scale.Selected_scale[i].Duration));
-		//	Console.WriteLine($"{scale.Selected_scale[i].Music_size}  {scale.Selected_scale[i].Duration}");
-		//	Console.WriteLine($"notes_sum_duration= {notes_sum_duration}");
-		}
-		Console.WriteLine($"notes_sum_duration= {notes_sum_duration}");
-		Console.WriteLine($"{notes_sum_duration / bpm* 60}");
-		return notes_sum_duration / bpm * 60;
+		Console.WriteLine($"трек длинной {tacts_num / bpm* 60} сек.");
+		return tacts_num / bpm * 60;
 	}
 	
-	public static void generate (Scale scale) // инициализация заголовочной части wav файла
+	private static float get_tacts_num(Tab tab)
+	{
+		float tacts_num= 0;
+		for (int i = 0; i< tab.Size;i++)
+		{
+			tacts_num+= 1/(tab.Selected_scale[i].Music_size* (float)Math.Pow(2,tab.Selected_scale[i].Duration));
+			Console.WriteLine($"{(tab.Selected_scale[i].Music_size* (float)Math.Pow(2,tab.Selected_scale[i].Duration))}");
+			Console.WriteLine($"tacts_num= {tacts_num}");
+		}
+		Console.WriteLine($" число тактов = {tacts_num}");
+		return tacts_num;
+	}
+	
+	public static void generate (Tab tab) // инициализация заголовочной части wav файла
 	{
 		FileStream stream = new FileStream("notes/test.wav", FileMode.Create); // создание файла
 		BinaryWriter composer= new BinaryWriter(stream); // создание двоичного композитора
@@ -87,7 +94,9 @@ public class Wolfish_WAV
 		bytesPerSecond= get_bytesPerSecond();
 		dataChunkSize= get_dataChunkSize();
 		fileSize= get_fileSize();
-		lengthInSec= get_lengthInSec(scale);
+		
+		tacts_num= get_tacts_num(tab);
+		lengthInSec= get_lengthInSec();
 		samples= get_samples();
 		
 		composer.Write(RIFF);
@@ -104,11 +113,11 @@ public class Wolfish_WAV
 		composer.Write(data);
 		composer.Write(dataChunkSize);
 		double freq;
-		for(int note_ind = 0; note_ind < scale.Size; note_ind++)
+		for(int note_ind = 0; note_ind < tab.Size; note_ind++)
 		{
-			freq= Math.PI * scale.Selected_scale[note_ind].Freq / samplesPerSecond;
+			freq= Math.PI * tab.Selected_scale[note_ind].Freq / samplesPerSecond;
 			
-			for (int i = 0; i < samples / scale.Size; i++)
+			for (int i = 0; i < samples / (tacts_num * tab.Selected_scale[note_ind].Music_size*Math.Pow(2,tab.Selected_scale[note_ind].Duration)) ; i++)
 			{
             			short s= (short)(Saw(i, freq) * ampl);
             			composer.Write(s);

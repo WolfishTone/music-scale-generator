@@ -16,7 +16,7 @@ public class Tone// нота
 			this.note= note.ToUpper();
 			octave= 1;
 			freq= get_freq(octave, note);
-			duration= 1;
+			duration= 2;
 			music_size= 4;
 		}
 	}
@@ -27,7 +27,7 @@ public class Tone// нота
 			this.note= note.ToUpper();
 			this.octave= octave;
 			freq= get_freq(octave, note);
-			duration= 1;
+			duration= 2;
 			music_size= 4;
 		}
 	}
@@ -71,7 +71,7 @@ public class Tone// нота
 			return freq;
 		}
 	}
-	private byte duration; // длительность ноты 0- целая; 1- четвертая; 2- восьмая; 3- шестнадцатая и.т.д.
+	private byte duration; // длительность ноты ?- целая; 0- четвертая; 1- восьмая; 2- шестнадцатая и.т.д.
 	public byte Duration
 	{
 		get
@@ -200,7 +200,9 @@ public class Tone// нота
 		copy.note= this.note;
 		copy.octave= this.octave;
 		copy.freq= this.freq;
-		copy.duration= this.duration;
+		Random rnd = new Random();
+		copy.duration = (byte)rnd.Next(0, 3);
+		//copy.duration= this.duration;
 		copy.music_size= this.music_size;
 		return copy;
 	}

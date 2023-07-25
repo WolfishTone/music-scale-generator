@@ -1,13 +1,13 @@
 using System;
 
-public class Scale // нотный стан
+public class Tab // нотный стан
 {
 	public Tone [] Selected_scale = new Tone[1000]; // выбранный пользователем лад
 	
 	// формулы ладов .==================================
 	static byte [][] scales= new byte[10][]; // лады
 	
-	public Scale() // создаем массив нот
+	public Tab() // создаем массив нот
 	{
 		string note = "c";
 		byte octave = 1;
@@ -15,20 +15,20 @@ public class Scale // нотный стан
 		scale_generation (note, octave, scale);
 	}
 	
-	public Scale(string note)
+	public Tab(string note)
 	{
 		byte octave = 1;
 		byte scale = 5;
 		scale_generation (note, octave, scale);
 	}
 	
-	public Scale(string note, byte octave)
+	public Tab(string note, byte octave)
 	{
 		byte scale = 5;
 		scale_generation (note, octave, scale);
 	}
 	
-	public Scale(string note, byte octave, byte scale)
+	public Tab(string note, byte octave, byte scale)
 	{
 		scale_generation (note, octave, scale);
 	}
@@ -44,19 +44,10 @@ public class Scale // нотный стан
 			return size;
 		}
 	}
-	
-	private byte time_signature= 4; // музыкальный размер
-	public byte Time_Signature
-	{
-		get
-		{
-			return time_signature;
-		}
-	}
 	//==================================================
 	
 	// методы /=========================================
-	public static void Make_up()
+	public static void Scales_make_up()
 	{
 		scales[0] = new byte []  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 		scales[1] = new byte []     {2, 2, 1, 2, 2, 2, 1}; // Ионийский (натуральный мажор)
