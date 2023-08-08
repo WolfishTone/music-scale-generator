@@ -9,29 +9,16 @@ public class Tone// нота
 	public Tone()
 	{
 	}
-	public Tone(string note)
+	public Tone(string note)// четвертая нота первой актавы
 	{	
 		if(is_note(note))
 		{
 			this.note= note.ToUpper();
-			octave= 1;
-			freq= get_freq(octave, note);
-			duration= 2;
-			music_size= 4;
+			freq= get_freq(octave, note); 
 		}
 	}
-	public Tone(string note, byte octave)
-	{
-		if(is_note(note) && is_right_octave (octave)) // проверяем название и номер октавы
-		{
-			this.note= note.ToUpper();
-			this.octave= octave;
-			freq= get_freq(octave, note);
-			duration= 2;
-			music_size= 4;
-		}
-	}
-	public Tone(string note, byte octave, byte duration, byte music_size)
+	
+	public Tone(string note, byte octave, byte duration, byte music_base)
 	{
 		if(is_note(note) && is_right_octave (octave)) // проверяем название и номер октавы
 		{
@@ -39,7 +26,7 @@ public class Tone// нота
 			this.octave= octave;
 			freq= get_freq(octave, note);
 			this.duration= duration;
-			this.music_size= music_size;
+			this.music_base= music_base;
 		}
 	}
 	
@@ -54,7 +41,7 @@ public class Tone// нота
 			return note;
 		}
 	}
-	private byte octave; // номер октавы
+	private byte octave= 1; // номер октавы
 	public byte Octave
 	{
 		get
@@ -71,7 +58,7 @@ public class Tone// нота
 			return freq;
 		}
 	}
-	private byte duration; // длительность ноты ?- целая; 0- четвертая; 1- восьмая; 2- шестнадцатая и.т.д.
+	private byte duration= 0; // длительность ноты ?- целая; 0- четвертая; 1- восьмая; 2- шестнадцатая и.т.д.
 	public byte Duration
 	{
 		get
@@ -80,15 +67,14 @@ public class Tone// нота
 		}
 	}
 	
-	private byte music_size; // длительность ноты
-	public byte Music_size
+	private byte music_base= 2; // основа может принимать значения: 2- четвертые 3- триоли
+	public byte Music_base
 	{
 		get
 		{
-			return music_size;
+			return music_base;
 		}
 	}
-	
 	//==================================================
 	
 	// методы /=========================================
@@ -171,14 +157,14 @@ public class Tone// нота
 		return false; // успешное завершение
 	}
 	
-	public bool Next_Note (byte duration, byte music_size)
+	public bool Next_Note (byte duration, byte music_base)
 	{
 		sbyte note_ind= note_index(note);
 		this.duration = duration;
-		this.music_size = music_size;
+		this.music_base = music_base;
 		if(note_ind == note_names.Length-1) // если нота B
 		{
-			if(this.octave == 8)
+			if(this.octave == 7)
 			{
 				this.note= "\\0"; // пустая нота
 				return true; // самая высокая нота
@@ -203,8 +189,20 @@ public class Tone// нота
 		Random rnd = new Random();
 		copy.duration = (byte)rnd.Next(0, 3);
 		//copy.duration= this.duration;
-		copy.music_size= this.music_size;
+		copy.music_base= this.music_base;
 		return copy;
 	}
+    public Tone Copy(bool t)
+    {
+        Tone copy = new Tone();
+        copy.note = this.note;
+        copy.octave = this.octave;
+        copy.freq = this.freq;
+        //Random rnd = new Random();
+        //copy.duration = (byte)rnd.Next(0, 3);
+        copy.duration = this.duration;
+        copy.music_base = this.music_base;
+        return copy;
+    }
 	//==================================================
 }

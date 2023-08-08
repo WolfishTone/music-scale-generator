@@ -2,10 +2,7 @@ using System;
 using System.IO;
 
 public class Wolfish_WAV
-{
-       	// конструкторы /===================================
-       	//==================================================
-       	
+{   	
        	// поля /===========================================
        	private static int RIFF = 0x46464952; // указание форматов
 	private static int WAVE = 0x45564157; // меня не касается
@@ -28,16 +25,7 @@ public class Wolfish_WAV
         private static int dataChunkSize;
 	private static int fileSize;
 	
-	private static short bpm = 24;
-	private static short Bpm // темп
-	{
-		get
-		{
-			return bpm;
-		}
-	}
-	
-	private static float tacts_num; // число тактов
+	//private static float tacts_num; // число тактов
 	//==================================================
 	
 	// методы /=========================================
@@ -63,67 +51,61 @@ public class Wolfish_WAV
 	
 	private static int get_fileSize()
 	{
-		return waveSize + headerSize + formatChunkSize + headerSize + dataChunkSize;
+		return waveSize + headerSize + formatChunkSize + headerSize + dataChunkSize+ 100000;
 	}
 	
-	private static float get_lengthInSec()
+	private static float get_lengthInSec(Tab tab)
 	{
-		Console.WriteLine($"трек длинной {tacts_num / bpm* 60} сек.");
-		return tacts_num / bpm * 60;
-	}
-	
-	private static float get_tacts_num(Tab tab)
-	{
-		float tacts_num= 0;
-		for (int i = 0; i< tab.Size;i++)
-		{
-			tacts_num+= 1/(tab.Selected_scale[i].Music_size* (float)Math.Pow(2,tab.Selected_scale[i].Duration));
-			Console.WriteLine($"{(tab.Selected_scale[i].Music_size* (float)Math.Pow(2,tab.Selected_scale[i].Duration))}");
-			Console.WriteLine($"tacts_num= {tacts_num}");
-		}
-		Console.WriteLine($" число тактов = {tacts_num}");
-		return tacts_num;
+		Console.WriteLine($"трек длинной {tab.Tacts_num / tab.Bpm* 60} сек.");
+		Console.WriteLine($"tab.Tacts_num= {tab.Tacts_num} tab.Bpm= {tab.Bpm}");
+		return tab.Tacts_num / tab.Bpm * 60;
 	}
 	
 	public static void generate (Tab tab) // инициализация заголовочной части wav файла
 	{
 		FileStream stream = new FileStream("notes/test.wav", FileMode.Create); // создание файла
-		BinaryWriter composer= new BinaryWriter(stream); // создание двоичного композитора
+		BinaryWriter performer= new BinaryWriter(stream); // создание двоичного композитора
 
 		sampleSize= get_sampleSize();
 		bytesPerSecond= get_bytesPerSecond();
 		dataChunkSize= get_dataChunkSize();
 		fileSize= get_fileSize();
 		
-		tacts_num= get_tacts_num(tab);
-		lengthInSec= get_lengthInSec();
+		//tacts_num= (uint)get_tacts_num(tab);
+		lengthInSec= get_lengthInSec(tab);
 		samples= get_samples();
 		
-		composer.Write(RIFF);
-         	composer.Write(fileSize);
-         	composer.Write(WAVE);
-	        composer.Write(format);
-        	composer.Write(formatChunkSize);
-        	composer.Write(formatType);
-		composer.Write(chenalNum);
-		composer.Write(samplesPerSecond);
-		composer.Write(bytesPerSecond);
-	        composer.Write(sampleSize);
-	        composer.Write(bitsPerSample); 
-		composer.Write(data);
-		composer.Write(dataChunkSize);
+		performer.Write(RIFF);
+         	performer.Write(fileSize);
+         	performer.Write(WAVE);
+	        performer.Write(format);
+        	performer.Write(formatChunkSize);
+        	performer.Write(formatType);
+		performer.Write(chenalNum);
+		performer.Write(samplesPerSecond);
+		performer.Write(bytesPerSecond);
+	        performer.Write(sampleSize);
+	        performer.Write(bitsPerSample); 
+		performer.Write(data);
+		performer.Write(dataChunkSize);
 		double freq;
+		uint samples_per_note; // кол-во семплов на конкретную ноту
+		
 		for(int note_ind = 0; note_ind < tab.Size; note_ind++)
 		{
-			freq= Math.PI * tab.Selected_scale[note_ind].Freq / samplesPerSecond;
-			
-			for (int i = 0; i < samples / (tacts_num * tab.Selected_scale[note_ind].Music_size*Math.Pow(2,tab.Selected_scale[note_ind].Duration)) ; i++)
+			for(int chenal_ind= 0; chenal_ind< chenalNum;chenal_ind++) // многоканальная запись
 			{
-            			short s= (short)(Saw(i, freq) * ampl);
-            			composer.Write(s);
+				freq= Math.PI * tab.User_tab[note_ind].Freq / samplesPerSecond;
+				samples_per_note= (uint)(samples / (tab.Tacts_num * tab.Music_size*Math.Pow(tab.User_tab[note_ind].Music_base,tab.User_tab[note_ind].Duration)));
+				for (int i = 0; i < samples_per_note; i++)
+				{
+            				short s= (short)(Saw(i, freq) * ampl);
+            				performer.Write(s);
+				}
 			}
 		}
-		composer.Close();
+		
+		performer.Close();
          	stream.Close();		
 	}
 	
