@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.IO;
 
 public class Wolfish_WAV
@@ -132,4 +132,4 @@ public class Wolfish_WAV
 			return -1;
 	}
 	//==================================================
-}
+}*/
